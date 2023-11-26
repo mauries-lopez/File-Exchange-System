@@ -2,7 +2,11 @@ import threading
 import socket
 import os
 
-host = '192.168.18.3'
+server_folder = "server_files"
+if not os.path.exists(server_folder):
+    os.makedirs(server_folder)
+
+host = '127.0.0.1'
 port = 12345
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((host, port))
