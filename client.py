@@ -1,7 +1,9 @@
 import threading
 import socket
 from datetime import datetime
+import os
 
+client_folder = ""
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 #Client Class for knowing the status of the client
@@ -72,7 +74,8 @@ send_thread = threading.Thread(target = client_send)
 
 #Function for starting the Client Application
 def start():
-    
+
+    global client_folder
     while True:
         try:
             client_command = input('Input command >>> ')
@@ -86,6 +89,7 @@ def start():
 
 def find_function(input_syntax):
 
+    global client_folder
     clientStatus = ClientStatus()
 
     func = input_syntax[0]
@@ -145,6 +149,11 @@ def find_function(input_syntax):
                     alias = str(input_syntax[1])
                     ClientStatus.alias = alias
                     client.send(alias.encode('utf-8'))
+
+                    client_folder = os.path.join("client_files", alias)
+                    if not os.path.exists(client_folder):
+                        os.makedirs(client_folder)
+
                     res = client_receive()
                     ClientStatus.registered = True
                     print(res)
@@ -164,7 +173,6 @@ def find_function(input_syntax):
     elif func == '/store':
 
         foundError = False
-
         if clientStatus.joined == False:
             print('Error: Storing to the Server has failed! Please connect to the server first.')
             return False
@@ -179,6 +187,7 @@ def find_function(input_syntax):
                     try:
                         #Check file if it exists
                         filename = str(input_syntax[1])
+                        storedClientFolder = os.path.join(client_folder, filename.split('.')[0] + '-stored.' + filename.split('.')[1])
                         file = open(filename, "rb")
                         file.close()
 
@@ -269,7 +278,7 @@ def find_function(input_syntax):
                         invalidFileName = True
                     
                     if invalidFileName == False:
-                        retrievedFileName = client.recv(1024).decode('utf-8')
+                        retrievedFileName = os.path.join(client_folder, client.recv(1024).decode('utf-8'))
 
                         if retrievedFileName == 'error':
                             print('Error: File not found in the server.')
@@ -307,7 +316,7 @@ def find_function(input_syntax):
         print('/chat - Join the chat server that supports Unicast and Broadcast feature')
         print('. . . . . /leavechat - To leave the chat server')
         print('/? - Request command help to output all Input Syntax commands for references\n')
-        
+
 
 
     elif func == '/chat':

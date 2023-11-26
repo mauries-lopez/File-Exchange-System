@@ -66,7 +66,7 @@ def handle_client(client):
                     print(f'Error: Upload failed. File not found.'.encode('utf-8'))
                 else:
                     origFileName = res
-                    storeFileName = client.recv(1024).decode('utf-8')
+                    storeFileName = os.path.join(server_folder, client.recv(1024).decode('utf-8'))
                     timeStamp = client.recv(1024).decode('utf-8')
 
                     print(f'{alias}<{timeStamp}>: Uploaded {origFileName}')
@@ -95,7 +95,7 @@ def handle_client(client):
                 print(f'{alias} requested for a file in the server'.encode('utf-8'))
                 client.send('retrieve?'.encode('utf-8'))
 
-                getFileName = client.recv(1024).decode('utf-8')
+                getFileName = os.path.join(server_folder, client.recv(1024).decode('utf-8'))
                 
                 if getFileName == 'error':
                     print(f'Error: Download failed. Command parameters do not match or is not allowed.'.encode('utf-8'))
@@ -125,7 +125,7 @@ def handle_client(client):
 
             elif signal == 'getDir':
                 print(f'{alias} requested for the list of files in the directory.'.encode('utf-8'))
-                files = [file for file in os.listdir() if not file.endswith(".py")]
+                files = [file for file in os.listdir(server_folder) if not file.endswith(".py")]
                 client.send(str(files).encode('utf-8'))
                 print(files)
 
