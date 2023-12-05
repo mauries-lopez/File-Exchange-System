@@ -388,7 +388,9 @@ def register_alias():
             register_button.config(state=DISABLED)
             store_button.config(state=NORMAL)
             retrieve_button.config(state=NORMAL)
+            dir_button.config(state=NORMAL)
             leave_button.config(state=NORMAL)
+
         except socket.error as e:
             # Error checking for client not connected to the server
             print('Error: Connection to the Server has failed! Please connect to the server first.')
@@ -479,7 +481,8 @@ def retrieve_file():
             invalidFileName = True
 
         if invalidFileName == False:
-            retrievedFileName = os.path.join(client_folder, filename)
+            fromServerFileName = client.recv(1024).decode('utf-8')
+            retrievedFileName = os.path.join(client_folder, fromServerFileName)
 
             if retrievedFileName == 'error':
                 print('Error: File not found in the server.')
@@ -503,6 +506,15 @@ def retrieve_file():
                     print(f'File received from Server: {retrievedFileName}')
 
                     file.close()
+
+# -------------------- SHOW SERVER FILES -------------------- #
+def show_server_files():
+    ClientStatus.request = 'getDir'
+    client_send()
+    res = client_receive()
+    message = 'Server Directory: ' + res
+    print(message)
+
 
 # -------------------- LEAVE SERVER -------------------- #
 def leave_server():
@@ -540,6 +552,9 @@ store_button.pack(pady=10)
 retrieve_button = Button(window, text="Retrieve File", command=retrieve_file,
                          state=DISABLED)
 retrieve_button.pack(pady=10)
+
+dir_button = Button(window, text="Dir", command=show_server_files, state=DISABLED)
+dir_button.pack(pady=10)
 
 leave_button = Button(window, text="Leave Server", command=leave_server, state=DISABLED)
 leave_button.pack(pady=10)
