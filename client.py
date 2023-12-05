@@ -1,3 +1,4 @@
+import ast
 import threading
 import socket
 from datetime import datetime
@@ -340,12 +341,12 @@ send_thread = threading.Thread(target=client_send)
 def connect_to_server():
     global clientStatus
     if clientStatus.joined == False:
-        # host = simpledialog.askstring("Server Connection", "Enter server IP address:")
-        # port = simpledialog.askinteger("Server Connection", "Enter server port:")
+        host = simpledialog.askstring("Server Connection", "Enter server IP address:")
+        port = simpledialog.askinteger("Server Connection", "Enter server port:")
 
         # TODO: Remove Later!!!
-        host = "127.0.0.1"
-        port = 12345
+        # host = "127.0.0.1"
+        # port = 12345
         try:
             client.connect((host, port))
             joined = True
@@ -368,10 +369,10 @@ def register_alias():
 
     if message == "alias?":
         try:
-            # alias = simpledialog.askstring("Register Alias", "Enter your alias:")
+            alias = simpledialog.askstring("Register Alias", "Enter your alias:")
 
             # TODO: Remove Later!!!
-            alias = "Alice"
+            # alias = "Alice"
 
             ClientStatus.alias = alias
             client.send(alias.encode('utf-8'))
@@ -423,11 +424,11 @@ def store_file():
                 file = open(filename, "rb")
                 file.close()
             except IndexError:
-                        # Error checking for missing filename
-                        client.send('fileError'.encode('utf-8'))
-                        res = client_receive()
-                        print(res)
-                        foundError = True
+                # Error checking for missing filename
+                client.send('fileError'.encode('utf-8'))
+                res = client_receive()
+                print(res)
+                foundError = True
             except FileNotFoundError as e :
                 # Error checking for file not found
                 client.send('fileError1'.encode('utf-8'))
@@ -512,8 +513,20 @@ def show_server_files():
     ClientStatus.request = 'getDir'
     client_send()
     res = client_receive()
-    message = 'Server Directory: ' + res
-    print(message)
+    files = ast.literal_eval(res)
+    # message = 'Server Directory: ' + files
+    show_files_window(files)
+
+
+def show_files_window(files):
+    files_window = Toplevel(window)
+    files_window.title("Server Files")
+
+    files_listbox = Listbox(files_window)
+    for file in files:
+        files_listbox.insert(END, file)
+
+    files_listbox.pack(padx=10, pady=10)
 
 
 # -------------------- LEAVE SERVER -------------------- #
