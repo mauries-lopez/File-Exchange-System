@@ -112,7 +112,8 @@ def handle_client(client):
                     if foundError == False:
                         file = open(getFileName, "rb")
 
-                        storedFilename = getFileName.split('.')[0] + '-received.' + getFileName.split('.')[1]
+                        storedFilename = os.path.basename(getFileName)
+                        # storedFilename = getFileName.split('.')[0] + '.' + getFileName.split('.')[1]
                         client.send(storedFilename.encode())
 
                         data = file.read()
