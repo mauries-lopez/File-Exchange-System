@@ -122,8 +122,9 @@ def register_alias():
                 os.makedirs(client_folder)
 
             res = client_receive()
+            print(res)
             ClientStatus.registered = True
-            messagebox.showinfo(res)
+            messagebox.showinfo("Registration", res)
 
             # enable buttons and disable register button
             register_button.config(state=DISABLED)
@@ -277,7 +278,7 @@ def leave_server():
         message = client_receive()
         print(message)
 
-        messagebox.showinfo(message)
+        messagebox.showinfo("Leave Server", message)
         window.destroy()
 
         return True
