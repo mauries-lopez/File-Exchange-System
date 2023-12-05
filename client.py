@@ -360,7 +360,7 @@ def connect_to_server():
 
 # -------------------- REGISTER ALIAS -------------------- #
 def register_alias():
-    global clientStatus
+    global clientStatus, client_folder
     ClientStatus.request = "getAlias"
     client_send()
     message = client_receive()
@@ -461,7 +461,48 @@ def store_file():
 
 # -------------------- RETRIEVE FILE -------------------- #
 def retrieve_file():
-    pass
+    invalidFileName = False
+    foundError = False
+    filename = ""
+
+    ClientStatus.request = "getRetrieve"
+    client_send()
+    res = client_receive()
+
+    if res == "retrieve?":
+        try:
+            filename = simpledialog.askstring("Retrieve File", "Enter the filename to retrieve:")
+            client.send(filename.encode('utf-8'))
+        except IndexError:
+            print('Error: Command parameters do not match or is not allowed.')
+            client.send('error'.encode('utf-8'))
+            invalidFileName = True
+
+        if invalidFileName == False:
+            retrievedFileName = os.path.join(client_folder, filename)
+
+            if retrievedFileName == 'error':
+                print('Error: File not found in the server.')
+                foundError = True
+            else:
+                if foundError == False:
+                    file = open(retrievedFileName, "wb")
+                    file_bytes = b""
+
+                    done = False
+
+                    while not done:
+                        data = client.recv(1024)
+                        file_bytes += data
+
+                        if b"<END>" in file_bytes:
+                            done = True
+
+                    file.write(file_bytes[:-5])
+
+                    print(f'File received from Server: {retrievedFileName}')
+
+                    file.close()
 
 # -------------------- LEAVE SERVER -------------------- #
 def leave_server():
