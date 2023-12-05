@@ -187,7 +187,7 @@ def find_function(input_syntax):
                     try:
                         #Check file if it exists
                         filename = str(input_syntax[1])
-                        storedClientFolder = os.path.join(client_folder, filename.split('.')[0] + '.' + filename.split('.')[1])
+                        storedClientFolder = os.path.join(client_folder, filename.split('.')[0] + '-stored.' + filename.split('.')[1])
                         file = open(filename, "rb")
                         file.close()
 
@@ -212,7 +212,7 @@ def find_function(input_syntax):
                         file = open(filename, "rb")
 
                         #Store a file to the server. Add '-store' as suffix to the filename
-                        storedFilename = filename.split('.')[0] + '.' + filename.split('.')[1]
+                        storedFilename = filename.split('.')[0] + '-stored.' + filename.split('.')[1]
                         client.send(storedFilename.encode())
 
                         #Current timestamp
@@ -278,7 +278,7 @@ def find_function(input_syntax):
                         invalidFileName = True
                     
                     if invalidFileName == False:
-                        retrievedFileName = os.path.join(client_folder, filename)
+                        retrievedFileName = os.path.join(client_folder, client.recv(1024).decode('utf-8'))
 
                         if retrievedFileName == 'error':
                             print('Error: File not found in the server.')
@@ -353,3 +353,14 @@ if __name__ == "__main__":
     send_thread.start()    
     receive_thread.join()
     send_thread.join()
+
+
+
+
+#Question: 
+        #1. For the alias or handles, kapag po ba may alias or handles na po ung isang client, bawal na po siya mag register ulit for a new unique alias or handles?
+        #2. For the error messages naman po, dapat po ba makikita ito sa server side and client side po?
+        #3. Ung sa file po since nasa localhost lang po ung pag test, pwede po ba mag lagay ng extra word sa filename if iistore na po sa server? Halimbawa po, mula sa original filename na "test.txt" magiging "test-store.txt" kapag nasa server na po. This also applies to receiving the file po.
+        #4. Okay lang po ba kahit CLI lang po ung interface?
+        #5. Kailangan po ba naka register po ung client bago siya mag leave? or pwede ung hindi naka register tapos makaka leave?
+        #6. Habang nag tetest po ng code, dapat po ba may sample txt file na po sa folder?
